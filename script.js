@@ -2,9 +2,19 @@
     var cnv = document.querySelector("canvas");
     var ctx = cnv.getContext("2d");
     // pixel do canvas
-    var tileSize = 32;
+    var tileSize = 64;
+    // pixel da imagem
+    var tileSrcSize = 96;
+    // imagem
+    var img = new Image();
+    img.src = "img/img.png";
+    // jogo renderiza apenas com a imagem carregada
+    img.addEventListener("load", function(){
+        requestAnimationFrame(loop, cnv); // responsável pela primeira chamada à função loop
+    }, false);
     // dimensões do canvas
     var WIDTH = cnv.width, HEIGHT = cnv.height;
+
     // personagem
     var player = {
         x: tileSize + 2,
@@ -193,12 +203,15 @@
         for(var row in maze){
             for(var column in maze[row]){
                 var tile = maze[row][column];
-                if(tile === 1){
-                    // coordenadas
-                    var x = column*tileSize; // 32 -> pixels
-                    var y = row*tileSize;
-                    ctx.fillRect(x, y, tileSize, tileSize); // desenhar retângulo: coordenadas; dimensões
-                }
+                // coordenadas
+                var x = column*tileSize; 
+                var y = row*tileSize;
+                //ctx.fillRect(x, y, tileSize, tileSize); // desenhar retângulo: coordenadas; dimensões
+                ctx.drawImage(
+                    img,
+                    tile * tileSrcSize,0,tileSrcSize,tileSrcSize,
+                    x, y, tileSize, tileSize
+                );
             }
         }
 
@@ -212,6 +225,4 @@
         render();
         requestAnimationFrame(loop, cnv);
     }
-
-    requestAnimationFrame(loop, cnv); // responsável pela primeira chamada à função loop
 }());
