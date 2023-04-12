@@ -17,6 +17,10 @@
     var LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40; // códigos das setas do teclado
     var mvLeft = false, mvUp = false, mvRight = false, mvDown = false; // personagem começa parado
 
+    // paredes para colisão
+    var walls = [];
+
+    // caminho do labirinto
     var maze = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -39,6 +43,44 @@
         [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     ];
+
+    // tornar as paredes sensíveis à colisão
+    for(var row in maze){
+        for(var column in maze[row]){
+            var tile = maze[row][column];
+            if(tile === 1){
+                // paredes de colisão
+                var wall = {
+                    x: tileSize*column,
+                    y: tileSize*row,
+                    width: tileSize,
+                    height: tileSize
+                };
+                walls.push(wall);
+            }
+        }
+    }
+
+    function blockRectangle(objA,objB){
+        // distância X entre o personagem e a parede
+		var distX = (objA.x + objA.width/2) - (objB.x + objB.width/2);
+        // distância Y entre o personagem e a parede
+		var distY = (objA.y + objA.height/2) - (objB.y + objB.height/2);
+		
+		var sumWidth = (objA.width + objB.width)/2;
+		var sumHeight = (objA.height + objB.height)/2;
+		
+		if(Math.abs(distX) < sumWidth && Math.abs(distY) < sumHeight){ // houve colisão
+			var overlapX = sumWidth - Math.abs(distX);
+			var overlapY = sumHeight - Math.abs(distY);
+			
+			if(overlapX > overlapY){
+				objA.y = distY > 0 ? objA.y + overlapY : objA.y - overlapY;
+			} else {
+				objA.x = distX > 0 ? objA.x + overlapX : objA.x - overlapX;
+			}
+		}
+	}
 
     // esperar teclas de movimentação
     window.addEventListener("keydown", keydownHandler, false); 
@@ -92,6 +134,12 @@
             player.y -= player.speed;
         } else if(mvDown && !mvUp){ // se move para baixo
             player.y += player.speed;
+        }
+
+        // verificar se o personagem colidiu com alguma parede
+        for(var i in walls){
+            var wall = walls[i];
+            blockRectangle(player, wall);
         }
     }
 
