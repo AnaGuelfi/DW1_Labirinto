@@ -19,16 +19,16 @@
     var player = {
         x: tileSize + 2,
         y: tileSize + 2,
-        width: 28,
-        height: 28,
-        speed: 2
+        width: 24,
+        height: 32,
+        speed: 2,
+        srcX: 0,
+        srcY: tileSrcSize,
+        countAnim: 0
     }; 
     // movimentação do personagem
     var LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40; // códigos das setas do teclado
     var mvLeft = false, mvUp = false, mvRight = false, mvDown = false; // personagem começa parado
-
-    // paredes para colisão
-    var walls = [];
 
     // caminho do labirinto
     var maze = [
@@ -57,6 +57,9 @@
     // tamanho total do layout do labirinto
     var T_WIDTH = maze[0].length * tileSize,
         T_HEIGHT = maze.length * tileSize;
+
+    // paredes para colisão
+    var walls = [];
 
     // tornar as paredes sensíveis à colisão
     for(var row in maze){
@@ -158,17 +161,35 @@
     }
 
     function update(){ // atualizar elementos do jogo
-        // movimentaçao
+        // movimentação
         if(mvLeft && !mvRight){ // se move para a esquerda
             player.x -= player.speed;
+            player.srcY = tileSrcSize + player.height * 2;
         } else if(mvRight && !mvLeft){ // se move para a direita
             player.x += player.speed;
+            player.srcY = tileSrcSize + player.height * 3;
         }
 
         if(mvUp && !mvDown){ // se move para cima
             player.y -= player.speed;
+            player.srcY = tileSrcSize + player.height * 1;
         } else if(mvDown && !mvUp){ // se move para baixo
             player.y += player.speed;
+            player.srcY = tileSrcSize + player.height * 0;
+        }
+
+        // sensação de movimento 
+        if(mvLeft || mvRight || mvUp || mvDown){
+            player.countAnim++;
+
+            if(player.countAnim >= 40){
+                player.countAnim = 0;
+            }
+
+            player.srcX = Math.floor(player.countAnim / 5) * player.width;
+        } else{
+            player.srcX = 0;
+            player.countAnim = 0;
         }
 
         // verificar se o personagem colidiu com alguma parede
@@ -215,8 +236,13 @@
             }
         }
 
-        ctx.fillStyle="#00f";
-        ctx.fillRect(player.x, player.y, player.width, player.height);
+        //ctx.fillStyle="#00f";
+        //ctx.fillRect(player.x, player.y, player.width, player.height);
+        ctx.drawImage(
+            img,
+            player.srcX, player.srcY, player.width, player.height,
+            player.x, player.y, player.width, player.height
+        );
         ctx.restore();
     }
 
