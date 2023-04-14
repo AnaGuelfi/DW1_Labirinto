@@ -67,19 +67,18 @@
         y: 0,
         width: WIDTH,
         height: HEIGHT,
-        // limite
-        innerLeftBoundary: function(){
-            return this.x + (this.width*0.25);
+        innerLeftBoundary: function(){ // limites
+            return this.x + (this.width * 0.25);
         },
         innerTopBoundary: function(){
-            return this.y + (this.height*0.25);
+            return this.y + (this.height * 0.25);
         },
         innerRightBoundary: function(){
-            return this.x + (this.width*0.75);
+            return this.x + (this.width * 0.75);
         },
         innerBottomBoundary: function(){
-            return this.y + (this.height*0.75);
-        },
+            return this.y + (this.height * 0.75);
+        }
     };
 
     // esperar teclas de movimentação
@@ -211,15 +210,15 @@
     // acompanhamento da câmera em função da posição do personagem
     function moveCam(){
         if(player.x < cam.innerLeftBoundary()){
-            cam.x = player.x - (cam.width * 0.25);
+           cam.x = player.x - (cam.width * 0.25);
         }
-        if(player.y < cam.innerTopBoundary){
+        if(player.y < cam.innerTopBoundary()){
             cam.y = player.y - (cam.height * 0.25);
         }
-        if(player.x + player.width > cam.innerRightBoundary){
+        if(player.x + player.width > cam.innerRightBoundary()){
             cam.x = player.x + player.width - (cam.width * 0.75);
         }
-        if(player.y + player.height > cam.innerBottomBoundary){
+        if(player.y + player.height > cam.innerBottomBoundary()){
             cam.y = player.y + player.height - (cam.height * 0.75);
         }
     }
