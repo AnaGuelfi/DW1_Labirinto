@@ -1,0 +1,39 @@
+body{
+    background-color: #c4dfff;
+}
+
+.flex_box{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.modal {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    z-index: 1;
+    transition: opacity .5s;
+    user-select: none;
+}
+
+#startModal{
+    opacity: 1;
+	z-index: 1;
+}
+
+#startContainer {
+    width: 500px;
+    height: 500px;
+    box-shadow: 0 0 10px #6cd0e2;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}

@@ -1,17 +1,26 @@
-(function(){
+const startModal = document.getElementById('startModal');
+const startContainer = document.getElementById('startContainer');
+
+startContainer.addEventListener('click', ()=>{
+    startModal.style.opacity = 0;
+    startModal.style.zIndex = -1;
+    play();
+})
+
+function play(){
     // definindo o canvas
     var cnv = document.querySelector("canvas");
     var ctx = cnv.getContext("2d");
     // dimensões
     var WIDTH = cnv.width, HEIGHT = cnv.height;
     // pixel do canvas
-    var tileSize = 64;
+    var tileSize = 32;
 
     // imagem
     var img = new Image();
     img.src = "img/img.png";
     // pixel da imagem
-     var tileSrcSize = 96;
+    var tileSrcSize = 96;
     // jogo renderiza apenas com a imagem carregada
     img.addEventListener("load", function(){
         requestAnimationFrame(loop, cnv); // responsável pela primeira chamada à função loop
@@ -62,14 +71,14 @@
     var walls = [];
 
     // sortear valores para definir um labirinto aleatório
-    function sortearNum(min, max) {
+    function randomNum(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    adicionarParedesExternas();
+    addOuterWalls();
 
     // Adicionar paredes externas "moldura" ao maze
-    function adicionarParedesExternas(){
+    function addOuterWalls(){
         for(var i = 0; i < maze.length; i++){
             if(i == 0 || i == (maze.length - 1)){
                 for(var j = 0; j < maze.length; j++){
@@ -82,38 +91,34 @@
         }
     }
 
-    // definir a saida do labirinto 
-    var saida = sortearNum(1, maze.length - 1);
-    maze[maze.length - 1][saida] = 0;
-
-    adicionarParedesInternas(true, 1, maze.length - 2, 1, maze.length - 2, saida);
+    addInnerWalls(true, 1, maze.length - 2, 1, maze.length - 2);
 
     // adicionar paredes internas ao maze, definindo a estrutura do labirinto
-    function adicionarParedesInternas(flag, larguraMin, larguraMax, alturaMin, alturaMax, pontoSaida){
+    function addInnerWalls(flag, larguraMin, larguraMax, alturaMin, alturaMax){
         if(flag){
             if(larguraMax - larguraMin < 2){
                 return;
             }
-            var alturaAux = Math.floor(sortearNum(alturaMin, alturaMax) / 2) * 2;
-            adicionarParedeHoriz(larguraMin, larguraMax, alturaAux);
+            var alturaAux = Math.floor(randomNum(alturaMin, alturaMax) / 2) * 2;
+            addHorizWall(larguraMin, larguraMax, alturaAux);
 
-            adicionarParedesInternas(!flag, larguraMin, larguraMax, alturaMin, alturaAux - 1, pontoSaida);
-            adicionarParedesInternas(!flag, larguraMin, larguraMax, alturaAux + 1, alturaMax, pontoSaida);
+            addInnerWalls(!flag, larguraMin, larguraMax, alturaMin, alturaAux - 1);
+            addInnerWalls(!flag, larguraMin, larguraMax, alturaAux + 1, alturaMax);
         } else {
             if(alturaMax - alturaMin < 2){
                 return;
             }
-            var larguraAux = Math.floor(sortearNum(larguraMin, larguraMax) /2 ) * 2;
-            adicionarParedeVert(alturaMin, alturaMax, larguraAux);
+            var larguraAux = Math.floor(randomNum(larguraMin, larguraMax) /2 ) * 2;
+            addVerticalWall(alturaMin, alturaMax, larguraAux);
 
-            adicionarParedesInternas(!flag, larguraMin, larguraAux - 1, alturaMin, alturaMax, pontoSaida);
-            adicionarParedesInternas(!flag, larguraAux + 1, larguraMax, alturaMin, alturaMax, pontoSaida);
+            addInnerWalls(!flag, larguraMin, larguraAux - 1, alturaMin, alturaMax);
+            addInnerWalls(!flag, larguraAux + 1, larguraMax, alturaMin, alturaMax);
         }
     }
 
     // adicionar paredes horizontais
-    function adicionarParedeHoriz(larguraMin, larguraMax, alturaAux){
-        var z = Math.floor(sortearNum(larguraMin, larguraMax) / 2) * 2 + 1;
+    function addHorizWall(larguraMin, larguraMax, alturaAux){
+        var z = Math.floor(randomNum(larguraMin, larguraMax) / 2) * 2 + 1;
         for(var i = larguraMin; i <= larguraMax; i++){
             if(i === z){
                 maze[alturaAux][i] = 0;
@@ -124,8 +129,8 @@
     }
 
     // adicionar paredes verticais
-    function adicionarParedeVert(alturaMin, alturaMax, larguraAux){
-        var z = Math.floor(sortearNum(alturaMin, alturaMax) / 2) * 2 + 1;
+    function addVerticalWall(alturaMin, alturaMax, larguraAux){
+        var z = Math.floor(randomNum(alturaMin, alturaMax) / 2) * 2 + 1;
         for(var i = alturaMin; i <= alturaMax; i++){
             if(i === z){
                 maze[i][larguraAux] = 0;
@@ -133,6 +138,16 @@
                 maze[i][larguraAux] = 1;
             }
         }
+    }
+
+    // definir a saida do labirinto 
+    var saida = randomNum(0, maze.length - 1);
+    maze[maze.length - 1][saida] = 1;
+    var blockSaida = {
+        x: tileSize * (maze.length - 1),
+        y: tileSize * saida,
+        width: tileSize,
+        height: tileSize
     }
 
     // câmera
@@ -282,6 +297,21 @@
         }
     }
 
+    function checkWin(){
+        // distância X entre o personagem e a parede
+		var distX = (player.x + player.width/2) - (blockSaida.x + blockSaida.width/2);
+        // distância Y entre o personagem e a parede
+		var distY = (player.y + player.height/2) - (blockSaida.y + blockSaida.height/2);
+		
+		var sumWidth = (player.width + blockSaida.width)/2;
+		var sumHeight = (player.height + blockSaida.height)/2;
+		
+		if(Math.abs(distX) < sumWidth && Math.abs(distY) < sumHeight){ // houve colisão
+            var resultadoHTML = document.getElementById("resultado");
+            resultadoHTML.style.backgroundColor = '#000';
+		}
+    }
+
     // acompanhamento da câmera em função da posição do personagem
     function moveCam(){
         if(player.x < cam.innerLeftBoundary()){
@@ -309,6 +339,7 @@
         movePlayer();
         feelMovements();
         checkCollision();
+        checkWin();
         moveCam();
         updateCam();
     }
@@ -334,6 +365,9 @@
             }
         }
 
+        ctx.fillStyle="#00f";
+        ctx.fillRect(blockSaida.y, blockSaida.x, blockSaida.width, blockSaida.height);
+
         ctx.drawImage(
             img,
             player.srcX, player.srcY, player.width, player.height,
@@ -349,4 +383,4 @@
         render();
         requestAnimationFrame(loop, cnv);
     }
-}());
+}
