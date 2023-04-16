@@ -32,28 +32,28 @@
     var LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40; // códigos das setas do teclado
     var mvLeft = false, mvUp = false, mvRight = false, mvDown = false; // personagem começa parado
 
-    // labirinto
+    // labirinto inicializado sem paredes
     var maze = [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ];
     // tamanho total do layout do labirinto
     var T_WIDTH = maze[0].length * tileSize,
@@ -61,13 +61,88 @@
     // paredes para colisão
     var walls = [];
 
+    // sortear valores para definir um labirinto aleatório
+    function sortearNum(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    adicionarParedesExternas();
+
+    // Adicionar paredes externas "moldura" ao maze
+    function adicionarParedesExternas(){
+        for(var i = 0; i < maze.length; i++){
+            if(i == 0 || i == (maze.length - 1)){
+                for(var j = 0; j < maze.length; j++){
+                    maze[i][j] = 1;
+                }
+            } else {
+                maze[i][0] = 1;
+                maze[i][maze.length - 1] = 1;
+            }
+        }
+    }
+
+    // definir a saida do labirinto 
+    var saida = sortearNum(1, maze.length - 1);
+    maze[maze.length - 1][saida] = 0;
+
+    adicionarParedesInternas(true, 1, maze.length - 2, 1, maze.length - 2, saida);
+
+    // adicionar paredes internas ao maze, definindo a estrutura do labirinto
+    function adicionarParedesInternas(flag, larguraMin, larguraMax, alturaMin, alturaMax, pontoSaida){
+        if(flag){
+            if(larguraMax - larguraMin < 2){
+                return;
+            }
+            var alturaAux = Math.floor(sortearNum(alturaMin, alturaMax) / 2) * 2;
+            adicionarParedeHoriz(larguraMin, larguraMax, alturaAux);
+
+            adicionarParedesInternas(!flag, larguraMin, larguraMax, alturaMin, alturaAux - 1, pontoSaida);
+            adicionarParedesInternas(!flag, larguraMin, larguraMax, alturaAux + 1, alturaMax, pontoSaida);
+        } else {
+            if(alturaMax - alturaMin < 2){
+                return;
+            }
+            var larguraAux = Math.floor(sortearNum(larguraMin, larguraMax) /2 ) * 2;
+            adicionarParedeVert(alturaMin, alturaMax, larguraAux);
+
+            adicionarParedesInternas(!flag, larguraMin, larguraAux - 1, alturaMin, alturaMax, pontoSaida);
+            adicionarParedesInternas(!flag, larguraAux + 1, larguraMax, alturaMin, alturaMax, pontoSaida);
+        }
+    }
+
+    // adicionar paredes horizontais
+    function adicionarParedeHoriz(larguraMin, larguraMax, alturaAux){
+        var z = Math.floor(sortearNum(larguraMin, larguraMax) / 2) * 2 + 1;
+        for(var i = larguraMin; i <= larguraMax; i++){
+            if(i === z){
+                maze[alturaAux][i] = 0;
+            } else{
+                maze[alturaAux][i] = 1;
+            }
+        }
+    }
+
+    // adicionar paredes verticais
+    function adicionarParedeVert(alturaMin, alturaMax, larguraAux){
+        var z = Math.floor(sortearNum(alturaMin, alturaMax) / 2) * 2 + 1;
+        for(var i = alturaMin; i <= alturaMax; i++){
+            if(i === z){
+                maze[i][larguraAux] = 0;
+            } else {
+                maze[i][larguraAux] = 1;
+            }
+        }
+    }
+
     // câmera
     var cam = {
         x: 0,
         y: 0,
         width: WIDTH,
         height: HEIGHT,
-        innerLeftBoundary: function(){ // limites
+        // limites
+        innerLeftBoundary: function(){ 
             return this.x + (this.width * 0.25);
         },
         innerTopBoundary: function(){
