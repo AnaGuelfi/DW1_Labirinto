@@ -28,8 +28,10 @@ function play(){
 
     // personagem
     var player = {
-        x: tileSize + 2,
-        y: tileSize + 2,
+        x: tileSize,
+        y: tileSize,
+        xMaze: 1,
+        yMaze: 1,
         width: 24,
         height: 32,
         speed: 2,
@@ -142,7 +144,7 @@ function play(){
 
     // definir a saida do labirinto 
     var saida = randomNum(0, maze.length - 1);
-    maze[maze.length - 1][saida] = 1;
+    maze[maze.length - 1][saida] = 0;
     var blockSaida = {
         x: tileSize * (maze.length - 1),
         y: tileSize * saida,
@@ -236,19 +238,26 @@ function play(){
     function movePlayer(){
         if(mvLeft && !mvRight){ // se move para a esquerda
             player.x -= player.speed;
+            player.xMaze = Math.floor(player.x / tileSize);
             player.srcY = tileSrcSize + player.height * 2;
         } else if(mvRight && !mvLeft){ // se move para a direita
             player.x += player.speed;
+            player.xMaze = Math.floor(player.x / tileSize);
             player.srcY = tileSrcSize + player.height * 3;
         }
 
         if(mvUp && !mvDown){ // se move para cima
             player.y -= player.speed;
+            player.yMaze = Math.floor(player.y / tileSize);
             player.srcY = tileSrcSize + player.height * 1;
         } else if(mvDown && !mvUp){ // se move para baixo
             player.y += player.speed;
+            player.yMaze = Math.floor(player.y / tileSize);
             player.srcY = tileSrcSize + player.height * 0;
         }
+        checkWin();
+        console.log('PLAYER ', player.xMaze, ' - ', player.yMaze);
+        console.log('BLOCO ', blockSaida.x / tileSize, ' - ', blockSaida.y / tileSize);
     }
 
     // sensação de movimento enquanto o personagem se move
@@ -298,18 +307,9 @@ function play(){
     }
 
     function checkWin(){
-        // distância X entre o personagem e a parede
-		var distX = (player.x + player.width/2) - (blockSaida.x + blockSaida.width/2);
-        // distância Y entre o personagem e a parede
-		var distY = (player.y + player.height/2) - (blockSaida.y + blockSaida.height/2);
-		
-		var sumWidth = (player.width + blockSaida.width)/2;
-		var sumHeight = (player.height + blockSaida.height)/2;
-		
-		if(Math.abs(distX) < sumWidth && Math.abs(distY) < sumHeight){ // houve colisão
-            var resultadoHTML = document.getElementById("resultado");
-            resultadoHTML.style.backgroundColor = '#000';
-		}
+        if(player.xMaze === (blockSaida.y / tileSize) && player.yMaze === (blockSaida.x / tileSize)){
+            alert('WIN');
+        }
     }
 
     // acompanhamento da câmera em função da posição do personagem
@@ -339,7 +339,6 @@ function play(){
         movePlayer();
         feelMovements();
         checkCollision();
-        checkWin();
         moveCam();
         updateCam();
     }
