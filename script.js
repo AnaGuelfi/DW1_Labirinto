@@ -80,22 +80,6 @@ function play(){
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    addOuterWalls();
-
-    // Adicionar paredes externas "moldura" ao maze
-    function addOuterWalls(){
-        for(var i = 0; i < maze.length; i++){
-            if(i == 0 || i == (maze.length - 1)){
-                for(var j = 0; j < maze.length; j++){
-                    maze[i][j] = 1;
-                }
-            } else {
-                maze[i][0] = 1;
-                maze[i][maze.length - 1] = 1;
-            }
-        }
-    }
-
     addInnerWalls(true, 1, maze.length - 2, 1, maze.length - 2);
 
     // adicionar paredes internas ao maze, definindo a estrutura do labirinto
@@ -124,7 +108,7 @@ function play(){
     // adicionar paredes horizontais
     function addHorizWall(larguraMin, larguraMax, alturaAux){
         var z = Math.floor(randomNum(larguraMin, larguraMax) / 2) * 2 + 1;
-        for(var i = larguraMin; i <= larguraMax; i++){
+        for(var i = larguraMin; i < larguraMax; i++){
             if(i === z){
                 maze[alturaAux][i] = 0;
             } else{
@@ -136,7 +120,7 @@ function play(){
     // adicionar paredes verticais
     function addVerticalWall(alturaMin, alturaMax, larguraAux){
         var z = Math.floor(randomNum(alturaMin, alturaMax) / 2) * 2 + 1;
-        for(var i = alturaMin; i <= alturaMax; i++){
+        for(var i = alturaMin; i < alturaMax; i++){
             if(i === z){
                 maze[i][larguraAux] = 0;
             } else {
@@ -145,9 +129,28 @@ function play(){
         }
     }
 
+    addOuterWalls();
+
+    // Adicionar paredes externas "moldura" ao maze
+    function addOuterWalls(){
+        for(var i = 0; i < maze.length; i++){
+            if(i == 0 || i == (maze.length - 1)){
+                for(var j = 0; j < maze.length; j++){
+                    maze[i][j] = 1;
+                }
+            } else {
+                maze[i][0] = 1;
+                maze[i][maze.length - 1] = 1;
+            }
+        }
+    }
+
     // definir a saida do labirinto 
-    var saida = randomNum(0, maze.length - 1);
+    var saida = randomNum(1, maze.length - 2);
+
     maze[maze.length - 1][saida] = 0;
+    maze[maze.length - 2][saida] = 0;
+
     var blockSaida = {
         x: tileSize * (maze.length - 1),
         y: tileSize * saida,
