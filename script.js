@@ -8,6 +8,39 @@ startContainer.addEventListener('click', ()=>{
 })
 
 function play(){
+    // cronômetro
+    var divCronometro = document.getElementById('position_relative');
+    divCronometro.style.opacity = 1;
+    divCronometro.style.zIndex = 1;
+    var hour = 0;
+    var minute = 0;
+    var second = 0;
+    var millisecond = 0;
+    var cron;
+    cron = setInterval(()=> {timer();}, 10);
+    function timer() {
+        if ((millisecond += 10) == 1000) {
+            millisecond = 0;
+            second++;
+        }
+        if (second == 60) {
+            second = 0;
+            minute++;
+        }
+        if (minute == 60) {
+            minute = 0;
+            hour++;
+        }
+        document.getElementById('hour').innerText = returnData(hour);
+        document.getElementById('minute').innerText = returnData(minute);
+        document.getElementById('second').innerText = returnData(second);
+        document.getElementById('millisecond').innerText = returnData(millisecond);
+    }
+        
+    function returnData(input) {
+        return input > 10 ? input : `0${input}`
+    }
+
     // definindo o canvas
     var cnv = document.querySelector("canvas");
     var ctx = cnv.getContext("2d");
@@ -293,6 +326,7 @@ function play(){
 
     function checkWin(){
         if(player.xMaze === (blockSaida.y / tileSize) && player.yMaze === (blockSaida.x / tileSize)){
+            clearInterval(cron);
             alert('WIN');
         }
     }
