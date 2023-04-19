@@ -155,27 +155,6 @@ function play(){
         height: tileSize
     }
 
-    // câmera
-    var cam = {
-        x: 0,
-        y: 0,
-        width: WIDTH,
-        height: HEIGHT,
-        // limites
-        innerLeftBoundary: function(){ 
-            return this.x + (this.width * 0.25);
-        },
-        innerTopBoundary: function(){
-            return this.y + (this.height * 0.25);
-        },
-        innerRightBoundary: function(){
-            return this.x + (this.width * 0.75);
-        },
-        innerBottomBoundary: function(){
-            return this.y + (this.height * 0.75);
-        }
-    };
-
     // esperar teclas de movimentação
     window.addEventListener("keydown", keydownHandler, false); 
     window.addEventListener("keyup", keyupHandler, false);
@@ -259,8 +238,8 @@ function play(){
             player.srcY = tileSrcSize + player.height * 0;
         }
         checkWin();
-        console.log('PLAYER ', player.xMaze, ' - ', player.yMaze);
-        console.log('BLOCO ', blockSaida.x / tileSize, ' - ', blockSaida.y / tileSize);
+        /*console.log('PLAYER ', player.xMaze, ' - ', player.yMaze);
+        console.log('BLOCO ', blockSaida.x / tileSize, ' - ', blockSaida.y / tileSize);*/
     }
 
     // sensação de movimento enquanto o personagem se move
@@ -315,42 +294,17 @@ function play(){
         }
     }
 
-    // acompanhamento da câmera em função da posição do personagem
-    function moveCam(){
-        if(player.x < cam.innerLeftBoundary()){
-           cam.x = player.x - (cam.width * 0.25);
-        }
-        if(player.y < cam.innerTopBoundary()){
-            cam.y = player.y - (cam.height * 0.25);
-        }
-        if(player.x + player.width > cam.innerRightBoundary()){
-            cam.x = player.x + player.width - (cam.width * 0.75);
-        }
-        if(player.y + player.height > cam.innerBottomBoundary()){
-            cam.y = player.y + player.height - (cam.height * 0.75);
-        }
-    }
-
-    // ajuste nas coordenadas da câmera para se enquadrarem no layout total do labirinto
-    function updateCam(){
-        cam.x = Math.max(0, Math.min(T_WIDTH - cam.width, cam.x));
-        cam.y = Math.max(0, Math.min(T_HEIGHT - cam.height, cam.y));
-    }
-
     // atualizar elementos do jogo
     function update(){ 
         movePlayer();
         feelMovements();
         checkCollision();
-        moveCam();
-        updateCam();
     }
 
     // representar graficamente os elementos do jogo
     function render(){ 
         ctx.clearRect(0,0,WIDTH,HEIGHT);
         ctx.save();
-        ctx.translate(-cam.x, -cam.y);
         for(var row in maze){
             for(var column in maze[row]){
                 var tile = maze[row][column];
