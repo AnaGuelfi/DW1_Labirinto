@@ -25,6 +25,9 @@ function play(){
     img.addEventListener("load", function(){
         requestAnimationFrame(loop, cnv); // responsável pela primeira chamada à função loop
     }, false);
+    var imgSaida = new Image();
+    imgSaida.src = "img/many_diego.png";
+    var tileSaidaSize = 60;
 
     // personagem
     var player = {
@@ -364,8 +367,11 @@ function play(){
             }
         }
 
-        ctx.fillStyle="#00f";
-        ctx.fillRect(blockSaida.y, blockSaida.x, blockSaida.width, blockSaida.height);
+        ctx.drawImage(
+            imgSaida,
+            maze[maze.length - 1][saida] * tileSrcSize, 0, tileSrcSize, tileSrcSize,
+            blockSaida.y, blockSaida.x, tileSaidaSize, tileSaidaSize
+        );
 
         ctx.drawImage(
             img,
