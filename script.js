@@ -8,6 +8,10 @@ startContainer.addEventListener('click', ()=>{
 })
 
 function play(){
+    // Orientações
+    var divOrientacoes = document.getElementById('inst');
+    divOrientacoes.style.opacity = 1;
+    divOrientacoes.style.zIndex = 1;
     // cronômetro
     var divCronometro = document.getElementById('position_relative');
     divCronometro.style.opacity = 1;
