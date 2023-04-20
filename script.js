@@ -49,7 +49,7 @@ function play(){
     // pixel do canvas
     var tileSize = 32;
 
-    // imagem
+    // imagem com o personagem e os blocos do layout
     var img = new Image();
     img.src = "img/img.png";
     // pixel da imagem
@@ -58,9 +58,13 @@ function play(){
     img.addEventListener("load", function(){
         requestAnimationFrame(loop, cnv); // responsável pela primeira chamada à função loop
     }, false);
+    // imagem com o ponto de saída
     var imgSaida = new Image();
     imgSaida.src = "img/many_diego.png";
     var tileSaidaSize = 60;
+    // imagem do inimigo
+    var imgInimigo = new Image();
+    imgInimigo.src = "img/inimigo.png";
 
     // personagem
     var player = {
@@ -78,6 +82,23 @@ function play(){
     // movimentação do personagem
     var LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40; // códigos das setas do teclado
     var mvLeft = false, mvUp = false, mvRight = false, mvDown = false; // personagem começa parado
+
+    // inimigo
+    var posEnemy = 576;
+    var enemy = {
+        x: posEnemy,
+        y: posEnemy,
+        xMaze: 18,
+        yMaze: 18,
+        width: 24,
+        height: 32,
+        speed: 1,
+        srcX: 0,
+        srcY: tileSrcSize,
+        direction: 'up',
+        countAnim: 0
+    };
+    changeDirection();
 
     // labirinto inicializado sem paredes
     var maze = [
@@ -274,8 +295,63 @@ function play(){
             player.srcY = tileSrcSize + player.height * 0;
         }
         checkWin();
-        /*console.log('PLAYER ', player.xMaze, ' - ', player.yMaze);
-        console.log('BLOCO ', blockSaida.x / tileSize, ' - ', blockSaida.y / tileSize);*/
+        checkEnemy();
+    }
+
+    // alterar direção do inimigo
+    function changeDirection(){
+        switch(enemy.direction){
+            case 'left':
+                enemy.x -= enemy.speed;
+                enemy.xMaze = Math.floor(enemy.x / tileSize);
+                enemy.srcY = tileSrcSize + enemy.height * 2;
+            break;
+            case 'right':
+                enemy.x += enemy.speed;
+                enemy.xMaze = Math.floor(enemy.x / tileSize);
+                enemy.srcY = tileSrcSize + enemy.height * 3;
+            break;
+            case 'up':
+                enemy.y -= enemy.speed;
+                enemy.yMaze = Math.floor(enemy.y / tileSize);
+                enemy.srcY = tileSrcSize + enemy.height * 1;
+            break;
+            case 'down':
+                enemy.y += enemy.speed;
+                enemy.yMaze = Math.floor(enemy.y / tileSize);
+                enemy.srcY = tileSrcSize + enemy.height * 0;
+            break;
+        }
+    }
+
+    // movimentação do inimigo
+    function moveEnemy(){
+        if(Math.floor(enemy.x)%tileSize === 0 & Math.floor(enemy.y)%tileSize === 0){
+            var enemyCol = enemy.xMaze;
+            var enemyRow = enemy.yMaze;
+            var validPath = [];
+
+            // Direções possíveis
+            if(maze[enemyRow][enemyCol - 1] !== 1 && (enemy.direction !== 'right')){ // célula à esquerda é válida
+                validPath.push('left');
+                console.log('left');
+            } 
+            if(maze[enemyRow][enemyCol + 1] !== 1 && (enemy.direction !== 'left')){ // célula à direia é válida
+                validPath.push('right');
+                console.log('right');
+            } 
+            if(maze[enemyRow - 1][enemyCol] !== 1 && (enemy.direction !== 'down')){ // célula acima é válida
+                validPath.push('up');
+                console.log('up');
+            } 
+            if(maze[enemyRow + 1][enemyCol] !== 1 && (enemy.direction !== 'up')){ // célula abaixo é válida
+                validPath.push('down');
+                console.log('down');
+            } 
+            enemy.direction = validPath[Math.floor(Math.random() * validPath.length)];
+            enemy.countAnim++;
+        } 
+        changeDirection();
     }
 
     // sensação de movimento enquanto o personagem se move
@@ -327,13 +403,21 @@ function play(){
     function checkWin(){
         if(player.xMaze === (blockSaida.y / tileSize) && player.yMaze === (blockSaida.x / tileSize)){
             clearInterval(cron);
-            alert('WIN');
+            alert('Fim de Jogo. Você venceu!');
+        }
+    }
+
+    function checkEnemy(){
+        if(player.xMaze === enemy.xMaze && player.yMaze === enemy.yMaze){
+            clearInterval(cron);
+            alert('Fim de Jogo. Você perdeu!');
         }
     }
 
     // atualizar elementos do jogo
     function update(){ 
         movePlayer();
+        moveEnemy();
         feelMovements();
         checkCollision();
     }
@@ -349,7 +433,7 @@ function play(){
                 // coordenadas
                 var x = column*tileSize; 
                 var y = row*tileSize;
-
+                // blocos
                 ctx.drawImage(
                     img,
                     tile * tileSrcSize,0,tileSrcSize,tileSrcSize,
@@ -357,17 +441,24 @@ function play(){
                 );
             }
         }
-
+        // saida
         ctx.drawImage(
             imgSaida,
             maze[maze.length - 1][saida] * tileSrcSize, 0, tileSrcSize, tileSrcSize,
             blockSaida.y, blockSaida.x, tileSaidaSize, tileSaidaSize
         );
-
+        // personagem principal
         ctx.drawImage(
             img,
             player.srcX, player.srcY, player.width, player.height,
             player.x, player.y, player.width, player.height
+        );
+
+        //inimigo
+        ctx.drawImage(
+            imgInimigo,
+            enemy.srcX, enemy.srcY, enemy.width, enemy.height,
+            enemy.x, enemy.y, enemy.width, enemy.height
         );
         ctx.restore();
     }

@@ -21,6 +21,7 @@ body{
     color: white;
     -webkit-text-stroke: 1px black;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    letter-spacing: 2px;
 }
 
 .modal {
@@ -49,6 +50,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
     cursor: pointer;
     background-image: url("https://www.pluggedin.com/wp-content/uploads/2019/12/ice-age-1024x576.jpg");
     background-size: auto;
